@@ -163,6 +163,7 @@ export const GeneralBookList = () => {
                 <h1>{item.title}</h1>
                 <h3>{item.price}</h3>
                 <h3>{item.stock} ក្បាល</h3>
+                <h3>{item.type}</h3>
                 <h3 className="whitespace-nowrap">{item.date}</h3>
                 <span>{item.authorId}</span>
               </div>
@@ -349,7 +350,7 @@ export const GeneralBookList = () => {
                 <p className="flex text-xl font-bold">
                   Date of Made: <p className="flex ml-4 text-gray-700">{updatedBook.date}</p>
                 </p>
-
+                <h3>{updatedBook.type}</h3>
                 <div className="flex justify-end mt-4">
                   <button
                     className="bg-gray-500 text-white p-2 rounded hover:bg-gray-800"
