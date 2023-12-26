@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, doc, deleteDoc, updateDoc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+  updateDoc,
+  setDoc,
+} from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, imgDB } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
@@ -7,7 +14,8 @@ import { LoadingProcess } from "../LoadingProcess/LoadingProcess";
 import { FaRegFilePdf } from "react-icons/fa";
 
 export const GeneralBookList = () => {
-  const [bacData, setBacData] = useState([]);
+  const [updatingData, setUpdatingData] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [NovelBook, setNovelBook] = useState([]);
   const [selectBook, setSelectBook] = useState({});
   const [loading, setLoading] = useState(false);
@@ -20,19 +28,19 @@ export const GeneralBookList = () => {
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
   const [updateSuccessPopup, setUpdateSuccessPopup] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
-  const [isSearchActive, setIsSearchActive] = useState(false); // New state variable
+  const [isSearchActive, setIsSearchActive] = useState(false);
   const [updatedBook, setUpdatedBook] = useState({
     title: "",
     price: "",
-    date: "",
-    decs: "",
-    authorId: "",
-    img: "",
+    description: "",
+    author: "",
+    image: "",
   });
+
   const handleSearch = (results) => {
     setSearchResults(results);
     setHoveredBook(null);
-    setIsSearchActive(results.length > 0); // Set isSearchActive based on whether there are search results
+    setIsSearchActive(results.length > 0);
   };
 
   const handleBookDetail = (bookId) => {
@@ -45,7 +53,6 @@ export const GeneralBookList = () => {
     if (loading) return;
     setSelectBook({ book });
     setOpenDeleteModal(true);
-    console.log(book);
   };
 
   const confirmDelete = async () => {
@@ -54,9 +61,14 @@ export const GeneralBookList = () => {
       if (!selectBook) {
         throw new Error("Selected book is undefined");
       }
-      const bookRef = doc(db, "Books", "All_Genre", "GeneralBook", selectBook.book);
+      const bookRef = doc(db, "books", selectBook.book);
       await deleteDoc(bookRef);
-
+  
+      // Update NovelBook state after successful deletion
+      setNovelBook((prevBooks) =>
+        prevBooks.filter((book) => book.id !== selectBook.book)
+      );
+  
       setShowSuccessPopup(true);
       alert("Delete Successful!!");
     } catch (error) {
@@ -66,6 +78,7 @@ export const GeneralBookList = () => {
       setOpenDeleteModal(false);
     }
   };
+  
 
   const handleUpdate = (book) => {
     setUpdatedBook(book);
@@ -75,79 +88,98 @@ export const GeneralBookList = () => {
   const confirmUpdate = async () => {
     setLoading(true);
     try {
-      const bookRef = doc(db, "Books", "All_Genre", "GeneralBook", updatedBook.id);
+      const bookRef = doc(db, "books", updatedBook.id);
       const newData = {
         title: updatedBook.title,
         price: updatedBook.price,
-        date: updatedBook.date,
-        authorId: updatedBook.authorId,
-        img: updatedBook.img,
+        author: updatedBook.author,
+        image: updatedBook.image,
       };
-
+  
       if (bookImage) {
-        const newImgRef = ref(imgDB, `WebsiteProject/Books/${bookImage.name + uuidv4()}`);
+        const newImgRef = ref(
+          imgDB,
+          `WebsiteProject/books/${bookImage.name + uuidv4()}`
+        );
         await uploadBytes(newImgRef, bookImage);
         const newImgUrl = await getDownloadURL(newImgRef);
         newData.img = newImgUrl;
       }
-
+  
       await updateDoc(bookRef, newData);
+  
+      // Update NovelBook state after successful update
+      setNovelBook((prevBooks) =>
+        prevBooks.map((book) =>
+          book.id === updatedBook.id ? { ...book, ...newData } : book
+        )
+      );
+  
       setUpdateSuccess(true);
     } catch (error) {
       console.error("Error updating document or image:", error.message);
     } finally {
       setLoading(false);
+      setUpdatingData(false);
       setUpdateModalOpen(false);
     }
   };
+  
+
+  const handleCategoryChange = async (event) => {
+    const selectedCategory = event.target.value;
+    setSelectedCategory(selectedCategory);
+    setSearchResults([]);
+  };
 
   useEffect(() => {
-    const getBacData = async () => {
+    const fetchData = async () => {
       try {
-        const contain = collection(db, "Books");
+        const contain = collection(db, "books");
         const snapshot = await getDocs(contain);
-        const data = snapshot.docs.map((val) => ({ ...val.data(), id: val.id }));
-        setBacData(data);
-        const bookDataPromises = data.map(async (elem) => {
-          try {
-            const BookPop = collection(db, `Books/${elem.id}/GeneralBook`);
-            const DataBooks = await getDocs(BookPop);
-            const BookData = DataBooks.docs.map((bookDoc) => ({
-              ...bookDoc.data(),
-              id: bookDoc.id,
-            }));
-            return BookData;
-          } catch (error) {
-            console.error(`Error fetching book data for ${elem.id}:`, error);
-            return null;
-          }
-        });
+        const data = snapshot.docs.map((val) => ({
+          ...val.data(),
+          id: val.id,
+        }));
 
-        const bookData = (await Promise.all(bookDataPromises)).flatMap((data) => data || []);
-        bookData.sort((a, b) => a.title.localeCompare(b.title));
-        setNovelBook(bookData);
+        // Filter data based on the selected category
+        const filteredData = selectedCategory
+          ? data.filter((item) => item.categories === selectedCategory)
+          : data;
 
-        if (updateSuccess) {
-          setUpdateSuccessPopup(true);
-
-          const timeoutId = setTimeout(() => {
-            setUpdateSuccessPopup(false);
-            setUpdateSuccess(false);
-          }, 3000);
-
-          return () => clearTimeout(timeoutId);
-        }
+        setNovelBook(filteredData);
       } catch (error) {
-        console.error("Error fetching popular section data:", error);
+        console.error("Error fetching book data:", error);
       }
     };
 
-    getBacData();
-  }, [showSuccessPopup, selectBook.authorId, updateSuccess]);
+    fetchData();
+  }, [selectedCategory, updateSuccessPopup, updateSuccess]);
 
   return (
-    <section>
+    <section key={selectedCategory}>
       <div className="container w-auto">
+        {/* Add the category filter dropdown */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Filter by Category:
+          </label>
+          <select
+            onChange={handleCategoryChange}
+            value={selectedCategory || ""}
+            className="mt-1 p-2 border rounded-md w-full"
+          >
+            <option value="">All Categories</option>
+            {/* Add options dynamically based on unique categories in NovelBook */}
+            {[...new Set(NovelBook.map((item) => item.categories))].map(
+              (category, index) => (
+                <option key={index} value={category}>
+                  {category}
+                </option>
+              )
+            )}
+          </select>
+        </div>
         {(isSearchActive ? searchResults : NovelBook).map((item, index) => (
           <div
             key={item.id}
@@ -157,15 +189,18 @@ export const GeneralBookList = () => {
             onMouseEnter={() => setHoveredBook(item.id)}
             onMouseLeave={() => setHoveredBook(null)}
           >
-            <img src={item.img} alt={`Novel-${index}`} className="w-[200px] h-[200px]" />
+            <img
+              src={item.image}
+              alt={`Novel-${index}`}
+              className="w-[200px] h-[200px]"
+            />
             <div className="flex w-full justify-between items-center">
               <div className="flex flex-col ml-7 text-lg font-bold space-y-4">
                 <h1>{item.title}</h1>
                 <h3>{item.price}</h3>
                 <h3>{item.stock} ក្បាល</h3>
-                <h3>{item.type}</h3>
-                <h3 className="whitespace-nowrap">{item.date}</h3>
-                <span>{item.authorId}</span>
+                <h3>{item.categories}</h3>
+                <span>{item.author}</span>
               </div>
 
               <div className="h-fit space-x-2 whitespace-nowrap ">
@@ -191,7 +226,7 @@ export const GeneralBookList = () => {
             </div>
           </div>
         ))}
-        {loading && showSuccessPopup && <LoadingProcess />}
+         {loading && showSuccessPopup && <LoadingProcess />}
         {openDeleteModal && (
           <div className="fixed inset-0 flex items-center justify-center">
             <div
@@ -222,7 +257,11 @@ export const GeneralBookList = () => {
         )}
 
         {/* Update Modal */}
-        <div className={`fixed inset-0 z-30 ${updateModalOpen ? "block" : "hidden"}`}>
+        <div
+          className={`fixed inset-0 z-30 ${
+            updateModalOpen ? "block" : "hidden"
+          }`}
+        >
           <div className="absolute inset-0 bg-black opacity-50"></div>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="bg-white p-4 rounded shadow-lg">
@@ -230,39 +269,45 @@ export const GeneralBookList = () => {
 
               {/* Update input fields to allow user input */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Title:</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Title:
+                </label>
                 <input
                   type="text"
                   className="mt-1 p-2 border rounded-md w-full"
                   value={updatedBook.title}
-                  onChange={(e) => setUpdatedBook({ ...updatedBook, title: e.target.value })}
+                  onChange={(e) =>
+                    setUpdatedBook({ ...updatedBook, title: e.target.value })
+                  }
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Price:</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Price:
+                </label>
                 <input
                   type="text"
                   className="mt-1 p-2 border rounded-md w-full"
                   value={updatedBook.price}
-                  onChange={(e) => setUpdatedBook({ ...updatedBook, price: e.target.value })}
+                  onChange={(e) =>
+                    setUpdatedBook({ ...updatedBook, price: e.target.value })
+                  }
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Description:</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Description:
+                </label>
                 <input
                   type="text"
                   className="mt-1 p-2 border rounded-md w-full"
-                  value={updatedBook.decs}
-                  onChange={(e) => setUpdatedBook({ ...updatedBook, decs: e.target.value })}
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">Date of Made:</label>
-                <input
-                  type="text"
-                  className="mt-1 p-2 border rounded-md w-full"
-                  value={updatedBook.date}
-                  onChange={(e) => setUpdatedBook({ ...updatedBook, date: e.target.value })}
+                  value={updatedBook.description}
+                  onChange={(e) =>
+                    setUpdatedBook({
+                      ...updatedBook,
+                      description: e.target.value,
+                    })
+                  }
                 />
               </div>
 
@@ -279,7 +324,10 @@ export const GeneralBookList = () => {
                 />
               </div>
               <div className="flex justify-end">
-                <button className="mr-2 bg-green-500 text-white p-2 rounded" onClick={() => confirmUpdate()}>
+                <button
+                  className="mr-2 bg-green-500 text-white p-2 rounded"
+                  onClick={() => confirmUpdate()}
+                >
                   Update
                 </button>
                 <button
@@ -294,8 +342,9 @@ export const GeneralBookList = () => {
         </div>
 
         {/* Loading Process during Update */}
-        {loading && updateModalOpen && <LoadingProcess />}
-
+        {loading && showSuccessPopup && updateSuccess && updateModalOpen && !updatingData ? (
+          <LoadingProcess />
+        ) : null}
         {/* Update Success Modal */}
         {updateSuccessPopup && (
           <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
@@ -315,18 +364,26 @@ export const GeneralBookList = () => {
           </div>
         )}
         {/* Show Book Detail */}
-        <div className={`fixed inset-0 z-50 ${bookDetailModalOpen ? "block" : "hidden"}`}>
+        <div
+          className={`fixed inset-0 z-50 ${
+            bookDetailModalOpen ? "block" : "hidden"
+          }`}
+        >
           <div className="absolute inset-0 bg-black opacity-50 "></div>
           <div className="absolute inset-0 flex items-center justify-center px-5">
             <div className="flex bg-white p-4 rounded shadow-xl mb-2 ">
               <div className="w-[50%] flex flex-col items-center justify-center">
                 <img
-                  src={updatedBook.img}
+                  src={updatedBook.image}
                   className="w-[500px] h-[500px] border-2 "
                   alt={updatedBook.title}
                 />
-                {updatedBook.BookPdf && (
-                  <a href={updatedBook.BookPdf} target="_blank" rel="noopener noreferrer">
+                {updatedBook.bookPdf && (
+                  <a
+                    href={updatedBook.bookPdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <button className="flex text-xl font-bold text-red-600 ml-4">
                       <p className="flex">View PDF</p>
                       <FaRegFilePdf className="flex mt-1" />
@@ -338,17 +395,20 @@ export const GeneralBookList = () => {
                 <h2 className="flex text-2xl font-bold mb-4">Book Detail</h2>
                 <p className="flex text-xl font-bold">
                   Title:
-                  <p className="flex ml-4 text-gray-700 hover:text-sky-800"> {updatedBook.title}</p>
+                  <p className="flex ml-4 text-gray-700 hover:text-sky-800">
+                    {" "}
+                    {updatedBook.title}
+                  </p>
                 </p>
                 <p className="flex text-xl font-bold">
-                  Price: <p className="flex ml-4 text-gray-700">{updatedBook.price}</p>
+                  Price:{" "}
+                  <p className="flex ml-4 text-gray-700">{updatedBook.price}</p>
                 </p>
                 <p className="flex text-xl font-bold">
                   Description:{" "}
-                  <p className="flex ml-4 text-gray-700 text-lg subpixel-antialiased ">{updatedBook.decs}</p>
-                </p>
-                <p className="flex text-xl font-bold">
-                  Date of Made: <p className="flex ml-4 text-gray-700">{updatedBook.date}</p>
+                  <p className="flex ml-4 text-gray-700 text-lg subpixel-antialiased ">
+                    {updatedBook.description}
+                  </p>
                 </p>
                 <h3>{updatedBook.type}</h3>
                 <div className="flex justify-end mt-4">

@@ -20,7 +20,7 @@ export const BookCrud = () => {
   const [BookPdf, setBookPdf] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const value = collection(db, "Books", "All_Genre", "GeneralBook");
+  const value = collection(db, "books");
   const authorCollection = collection(db, "Author");
 
   const fetchAuthors = async () => {
@@ -40,8 +40,8 @@ export const BookCrud = () => {
   const handleAddBook = async () => {
     if (!BookCover || !BookPdf || loading) return;
     setLoading(true);
-    const imgRef = ref(imgDB, `WebsiteProject/Books/${BookCover.name + uuidv4()}`);
-    const pdfRef = ref(imgDB, `WebsiteProject/Books/${BookPdf.name + uuidv4()}`);
+    const imgRef = ref(imgDB, `WebsiteProject/books/${BookCover.name + uuidv4()}`);
+    const pdfRef = ref(imgDB, `WebsiteProject/books/${BookPdf.name + uuidv4()}`);
 
     try {
       // Upload image
@@ -53,14 +53,14 @@ export const BookCrud = () => {
       const pdfUrl = await getDownloadURL(pdfRef);
       await addDoc(value, {
         title: Booktitle,
-        decs: Bookdesc,
+        description: Bookdesc,
         price: BookPrice,
         date: BookDate,
         stock: Stock,
-        img: imageUrl,
-        BookPdf: pdfUrl,
-        authorId: selectedAuthor,
-        type: type, // Add category field
+        image: imageUrl,
+        bookPdf: pdfUrl,
+        author: selectedAuthor,
+        categories: type, // Add category field
       });
 
       alert("Book data & Image Upload");
@@ -100,7 +100,7 @@ export const BookCrud = () => {
         value={Bookdesc}
         onChange={(e) => setBookdesc(e.target.value)}
         placeholder="ព័ត៌មានរបស់សៀវភៅ"
-        className="p-2 rounded-lg  border rounded-md focus:outline-none focus:border-blue-500"
+        className="p-2 rounded-lg  border focus:outline-none focus:border-blue-500"
       />
       <input
         value={BookPrice}

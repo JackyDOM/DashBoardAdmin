@@ -21,18 +21,18 @@ export const Dashboard = () => {
         return <Author />;
       case "/dashboard/general-book":
         return <Generalbook />;
-      case "/dashboard/bacii-book":
-        return <BaciiBook />;
-      case "/dashboard/novel-book":
-        return <NovelBook />;
-      case "/dashboard/comic-book":
-        return <ComicBook />;
-      case "/dashboard/practice-book":
-        return <PracticeBook />;
-      // case "/dashboard/math-book":
-      //   return <Mathematic />;
-      case "/dashboard/khmer-book":
-        return <KhmerBook />;
+      // case "/dashboard/bacii-book":
+      //   return <BaciiBook />;
+      // case "/dashboard/novel-book":
+      //   return <NovelBook />;
+      // case "/dashboard/comic-book":
+      //   return <ComicBook />;
+      // case "/dashboard/practice-book":
+      //   return <PracticeBook />;
+      // // case "/dashboard/math-book":
+      // //   return <Mathematic />;
+      // case "/dashboard/khmer-book":
+      //   return <KhmerBook />;
       default:
         return (
           <div className="text-center text-2xl font-medium">
@@ -45,7 +45,9 @@ export const Dashboard = () => {
   return (
     <div className="w-full h-screen flex">
       <div className="flex flex-col w-[25%] h-screen bg-neutral-300 bg-shadow-lg">
-        <p className="my-3 text-center text-gray-800 text-4xl font-title font-bold">Welcome Admin</p>
+        <p className="my-3 text-center text-gray-800 text-4xl font-title font-bold">
+          Welcome Admin
+        </p>
 
         <ul className="my-5 duration-300 whitespace-nowrap">
           <li className="flex items-center justify-center">
@@ -65,7 +67,9 @@ export const Dashboard = () => {
             <Link
               to="/dashboard/author"
               className={`${
-                window.location.pathname === "/dashboard/author" ? "bg-gray-900 text-white" : "bg-neutral-100"
+                window.location.pathname === "/dashboard/author"
+                  ? "bg-gray-900 text-white"
+                  : "bg-neutral-100"
               } w-full h-[70px] border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
             >
               អ្នកនិពន្ធ
@@ -83,7 +87,7 @@ export const Dashboard = () => {
               សៀវភៅ ចំណេះទូទៅ
             </Link>
           </li>
-          <li className="flex items-center justify-center">
+          {/* <li className="flex items-center justify-center">
             <Link
               to="/dashboard/khmer-book"
               className={`${
@@ -142,7 +146,7 @@ export const Dashboard = () => {
             >
               សៀវភៅ លំហាត់
             </Link>
-          </li>
+          </li> */}
           {/* <li className="flex items-center justify-center">
             <Link
               to="/dashboard/math-book"
@@ -157,7 +161,9 @@ export const Dashboard = () => {
           </li> */}
         </ul>
       </div>
-      <div className="flex-grow overflow-y-auto bg-neutral-200 w-[75%] ">{renderContent()}</div>
+      <div className="flex-grow overflow-y-auto bg-neutral-200 w-[75%] ">
+        {renderContent()}
+      </div>
     </div>
   );
 };
