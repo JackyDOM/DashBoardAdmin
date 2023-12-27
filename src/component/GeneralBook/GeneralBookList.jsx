@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  collection,
-  getDocs,
-  doc,
-  deleteDoc,
-  updateDoc,
-  setDoc,
-} from "firebase/firestore";
+import { collection, getDocs, doc, deleteDoc, updateDoc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, imgDB } from "../../firebase";
 import { v4 as uuidv4 } from "uuid";
@@ -63,12 +56,10 @@ export const GeneralBookList = () => {
       }
       const bookRef = doc(db, "books", selectBook.book);
       await deleteDoc(bookRef);
-  
+
       // Update NovelBook state after successful deletion
-      setNovelBook((prevBooks) =>
-        prevBooks.filter((book) => book.id !== selectBook.book)
-      );
-  
+      setNovelBook((prevBooks) => prevBooks.filter((book) => book.id !== selectBook.book));
+
       setShowSuccessPopup(true);
       alert("Delete Successful!!");
     } catch (error) {
@@ -78,7 +69,6 @@ export const GeneralBookList = () => {
       setOpenDeleteModal(false);
     }
   };
-  
 
   const handleUpdate = (book) => {
     setUpdatedBook(book);
@@ -92,39 +82,27 @@ export const GeneralBookList = () => {
       const newData = {
         title: updatedBook.title,
         price: parseInt(updatedBook.price, 10),
+        description: updatedBook.description,
         author: updatedBook.author,
         image: updatedBook.image,
       };
-  
+
       if (bookImage) {
-        const newImgRef = ref(
-          imgDB,
-          `WebsiteProject/books/${bookImage.name + uuidv4()}`
-        );
+        const newImgRef = ref(imgDB, `WebsiteProject/books/${bookImage.name + uuidv4()}`);
         await uploadBytes(newImgRef, bookImage);
         const newImgUrl = await getDownloadURL(newImgRef);
-        newData.img = newImgUrl;
+        newData.image = newImgUrl;
       }
-  
+
       await updateDoc(bookRef, newData);
-  
-      // Update NovelBook state after successful update
-      setNovelBook((prevBooks) =>
-        prevBooks.map((book) =>
-          book.id === updatedBook.id ? { ...book, ...newData } : book
-        )
-      );
-  
       setUpdateSuccess(true);
     } catch (error) {
       console.error("Error updating document or image:", error.message);
     } finally {
       setLoading(false);
-      setUpdatingData(false);
       setUpdateModalOpen(false);
     }
   };
-  
 
   const handleCategoryChange = async (event) => {
     const selectedCategory = event.target.value;
@@ -147,23 +125,39 @@ export const GeneralBookList = () => {
           ? data.filter((item) => item.categories === selectedCategory)
           : data;
 
-        setNovelBook(filteredData);
+        // Sort the filtered data by the 'title' property (modify as needed)
+        const sortedData = filteredData.sort((a, b) => {
+          const titleA = a.title.toLowerCase();
+          const titleB = b.title.toLowerCase();
+          return titleA.localeCompare(titleB);
+        });
+
+        setNovelBook(sortedData);
+
+        if (updateSuccess) {
+          setUpdateSuccessPopup(true);
+
+          const timeoutId = setTimeout(() => {
+            setUpdateSuccessPopup(false);
+            setUpdateSuccess(false);
+          }, 3000);
+
+          return () => clearTimeout(timeoutId);
+        }
       } catch (error) {
-        console.error("Error fetching book data:", error);
+        console.error("Error fetching and sorting data:", error);
       }
     };
 
     fetchData();
-  }, [selectedCategory, updateSuccessPopup, updateSuccess]);
+  }, [showSuccessPopup, selectBook.authorId, updateSuccess, selectedCategory]);
 
   return (
     <section key={selectedCategory}>
       <div className="container w-auto">
         {/* Add the category filter dropdown */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Filter by Category:
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Filter by Category:</label>
           <select
             onChange={handleCategoryChange}
             value={selectedCategory || ""}
@@ -171,13 +165,11 @@ export const GeneralBookList = () => {
           >
             <option value="">All Categories</option>
             {/* Add options dynamically based on unique categories in NovelBook */}
-            {[...new Set(NovelBook.map((item) => item.categories))].map(
-              (category, index) => (
-                <option key={index} value={category}>
-                  {category}
-                </option>
-              )
-            )}
+            {[...new Set(NovelBook.map((item) => item.categories))].map((category, index) => (
+              <option key={index} value={category}>
+                {category}
+              </option>
+            ))}
           </select>
         </div>
         {(isSearchActive ? searchResults : NovelBook).map((item, index) => (
@@ -189,11 +181,7 @@ export const GeneralBookList = () => {
             onMouseEnter={() => setHoveredBook(item.id)}
             onMouseLeave={() => setHoveredBook(null)}
           >
-            <img
-              src={item.image}
-              alt={`Novel-${index}`}
-              className="w-[200px] h-[200px]"
-            />
+            <img src={item.image} alt={`Novel-${index}`} className="w-[200px] h-[200px]" />
             <div className="flex w-full justify-between items-center">
               <div className="flex flex-col ml-7 text-lg font-bold space-y-4">
                 <h1>{item.title}</h1>
@@ -226,7 +214,7 @@ export const GeneralBookList = () => {
             </div>
           </div>
         ))}
-         {loading && showSuccessPopup && <LoadingProcess />}
+        {loading && showSuccessPopup && <LoadingProcess />}
         {openDeleteModal && (
           <div className="fixed inset-0 flex items-center justify-center">
             <div
@@ -257,11 +245,7 @@ export const GeneralBookList = () => {
         )}
 
         {/* Update Modal */}
-        <div
-          className={`fixed inset-0 z-30 ${
-            updateModalOpen ? "block" : "hidden"
-          }`}
-        >
+        <div className={`fixed inset-0 z-30 ${updateModalOpen ? "block" : "hidden"}`}>
           <div className="absolute inset-0 bg-black opacity-50"></div>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="bg-white p-4 rounded shadow-lg">
@@ -269,35 +253,25 @@ export const GeneralBookList = () => {
 
               {/* Update input fields to allow user input */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Title:
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Title:</label>
                 <input
                   type="text"
                   className="mt-1 p-2 border rounded-md w-full"
                   value={updatedBook.title}
-                  onChange={(e) =>
-                    setUpdatedBook({ ...updatedBook, title: e.target.value })
-                  }
+                  onChange={(e) => setUpdatedBook({ ...updatedBook, title: e.target.value })}
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Price:
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Price:</label>
                 <input
                   type="text"
                   className="mt-1 p-2 border rounded-md w-full"
                   value={updatedBook.price}
-                  onChange={(e) =>
-                    setUpdatedBook({ ...updatedBook, price: e.target.value })
-                  }
+                  onChange={(e) => setUpdatedBook({ ...updatedBook, price: e.target.value })}
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Description:
-                </label>
+                <label className="block text-sm font-medium text-gray-700">Description:</label>
                 <input
                   type="text"
                   className="mt-1 p-2 border rounded-md w-full"
@@ -324,10 +298,7 @@ export const GeneralBookList = () => {
                 />
               </div>
               <div className="flex justify-end">
-                <button
-                  className="mr-2 bg-green-500 text-white p-2 rounded"
-                  onClick={() => confirmUpdate()}
-                >
+                <button className="mr-2 bg-green-500 text-white p-2 rounded" onClick={() => confirmUpdate()}>
                   Update
                 </button>
                 <button
@@ -364,11 +335,7 @@ export const GeneralBookList = () => {
           </div>
         )}
         {/* Show Book Detail */}
-        <div
-          className={`fixed inset-0 z-50 ${
-            bookDetailModalOpen ? "block" : "hidden"
-          }`}
-        >
+        <div className={`fixed inset-0 z-50 ${bookDetailModalOpen ? "block" : "hidden"}`}>
           <div className="absolute inset-0 bg-black opacity-50 "></div>
           <div className="absolute inset-0 flex items-center justify-center px-5">
             <div className="flex bg-white p-4 rounded shadow-xl mb-2 ">
@@ -379,11 +346,7 @@ export const GeneralBookList = () => {
                   alt={updatedBook.title}
                 />
                 {updatedBook.bookPdf && (
-                  <a
-                    href={updatedBook.bookPdf}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href={updatedBook.bookPdf} target="_blank" rel="noopener noreferrer">
                     <button className="flex text-xl font-bold text-red-600 ml-4">
                       <p className="flex">View PDF</p>
                       <FaRegFilePdf className="flex mt-1" />
@@ -395,14 +358,10 @@ export const GeneralBookList = () => {
                 <h2 className="flex text-2xl font-bold mb-4">Book Detail</h2>
                 <p className="flex text-xl font-bold">
                   Title:
-                  <p className="flex ml-4 text-gray-700 hover:text-sky-800">
-                    {" "}
-                    {updatedBook.title}
-                  </p>
+                  <p className="flex ml-4 text-gray-700 hover:text-sky-800"> {updatedBook.title}</p>
                 </p>
                 <p className="flex text-xl font-bold">
-                  Price:{" "}
-                  <p className="flex ml-4 text-gray-700">{updatedBook.price}</p>
+                  Price: <p className="flex ml-4 text-gray-700">{updatedBook.price}</p>
                 </p>
                 <p className="flex text-xl font-bold">
                   Description:{" "}

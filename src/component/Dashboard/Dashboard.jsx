@@ -21,8 +21,8 @@ export const Dashboard = () => {
         return <Author />;
       case "/dashboard/general-book":
         return <Generalbook />;
-      // case "/dashboard/bacii-book":
-      //   return <BaciiBook />;
+      case "/dashboard/bacii-book":
+        return <BaciiBook />;
       // case "/dashboard/novel-book":
       //   return <NovelBook />;
       // case "/dashboard/comic-book":
@@ -83,18 +83,6 @@ export const Dashboard = () => {
               Books
             </Link>
           </li>
-          {/* <li className="flex items-center justify-center">
-            <Link
-              to="/dashboard/khmer-book"
-              className={`${
-                window.location.pathname === "/dashboard/khmer-book"
-                  ? "bg-gray-900 text-white"
-                  : "bg-neutral-100"
-              } w-full h-[70px] border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
-            >
-              សៀវភៅ អក្សរសិល្ប៍
-            </Link>
-          </li>
           <li className="flex items-center justify-center">
             <Link
               to="/dashboard/bacii-book"
@@ -107,6 +95,19 @@ export const Dashboard = () => {
               សៀវភៅ ក្រសួង
             </Link>
           </li>
+          {/* <li className="flex items-center justify-center">
+            <Link
+              to="/dashboard/khmer-book"
+              className={`${
+                window.location.pathname === "/dashboard/khmer-book"
+                  ? "bg-gray-900 text-white"
+                  : "bg-neutral-100"
+              } w-full h-[70px] border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
+            >
+              សៀវភៅ អក្សរសិល្ប៍
+            </Link>
+          </li>
+         
           <li className="flex items-center justify-center">
             <Link
               to="/dashboard/novel-book"
