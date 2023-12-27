@@ -167,12 +167,11 @@ export const GeneralBookList = () => {
             className="mt-1 p-2 border rounded-md w-full"
           >
             <option value="">All Categories</option>
-            {/* Add options dynamically based on unique categories in NovelBook */}
-            {[...new Set(NovelBook.map((item) => item.categories))].map((category, index) => (
-              <option key={index} value={category}>
-                {category}
-              </option>
-            ))}
+            <option value="comic">Comics</option>
+            <option value="novel">Novel</option>
+            <option value="study">Study</option>
+            <option value="comdy">Comdy</option>
+            {/* Add more options as needed */}
           </select>
         </div>
         {(isSearchActive ? searchResults : NovelBook).map((item, index) => (
@@ -301,7 +300,10 @@ export const GeneralBookList = () => {
                 />
               </div>
               <div className="flex justify-end">
-                <button className="mr-2 bg-green-500 active:bg-blue-200 text-white p-2 rounded" onClick={() => confirmUpdate()}>
+                <button
+                  className="mr-2 bg-green-500 active:bg-blue-200 text-white p-2 rounded"
+                  onClick={() => confirmUpdate()}
+                >
                   Update
                 </button>
                 <button
