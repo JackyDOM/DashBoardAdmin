@@ -44,10 +44,8 @@ export const Dashboard = () => {
 
   return (
     <div className="w-full h-screen flex">
-      <div className="flex flex-col w-[25%] h-screen bg-neutral-300 bg-shadow-lg">
-        <p className="my-3 text-center text-gray-800 text-4xl font-title font-bold">
-          Welcome Admin
-        </p>
+      <div className="flex flex-col w-[20%] h-screen bg-neutral-300 bg-shadow-lg">
+        <p className="my-3 text-center text-gray-800 text-4xl font-title font-bold">Welcome Admin</p>
 
         <ul className="my-5 duration-300 whitespace-nowrap">
           <li className="flex items-center justify-center">
@@ -67,12 +65,10 @@ export const Dashboard = () => {
             <Link
               to="/dashboard/author"
               className={`${
-                window.location.pathname === "/dashboard/author"
-                  ? "bg-gray-900 text-white"
-                  : "bg-neutral-100"
+                window.location.pathname === "/dashboard/author" ? "bg-gray-900 text-white" : "bg-neutral-100"
               } w-full h-[70px] border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
             >
-              អ្នកនិពន្ធ
+              Author
             </Link>
           </li>
           <li className="flex items-center justify-center">
@@ -84,7 +80,7 @@ export const Dashboard = () => {
                   : "bg-neutral-100"
               } w-full h-[70px]  border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
             >
-              សៀវភៅ ចំណេះទូទៅ
+              Books
             </Link>
           </li>
           {/* <li className="flex items-center justify-center">
@@ -161,9 +157,7 @@ export const Dashboard = () => {
           </li> */}
         </ul>
       </div>
-      <div className="flex-grow overflow-y-auto bg-neutral-200 w-[75%] ">
-        {renderContent()}
-      </div>
+      <div className="flex-grow overflow-y-auto bg-neutral-200 w-[75%] ">{renderContent()}</div>
     </div>
   );
 };
