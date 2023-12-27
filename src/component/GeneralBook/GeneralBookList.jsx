@@ -73,9 +73,11 @@ export const GeneralBookList = () => {
   const handleUpdate = (book) => {
     setUpdatedBook(book);
     setUpdateModalOpen(true);
+    console.log("Update process started");
   };
 
   const confirmUpdate = async () => {
+    setUpdatingData(true);
     setLoading(true);
     try {
       const bookRef = doc(db, "books", updatedBook.id);
@@ -100,6 +102,7 @@ export const GeneralBookList = () => {
       console.error("Error updating document or image:", error.message);
     } finally {
       setLoading(false);
+      setUpdatingData(false);
       setUpdateModalOpen(false);
     }
   };
@@ -298,11 +301,11 @@ export const GeneralBookList = () => {
                 />
               </div>
               <div className="flex justify-end">
-                <button className="mr-2 bg-green-500 text-white p-2 rounded" onClick={() => confirmUpdate()}>
+                <button className="mr-2 bg-green-500 active:bg-blue-200 text-white p-2 rounded" onClick={() => confirmUpdate()}>
                   Update
                 </button>
                 <button
-                  className="bg-gray-500 text-white p-2 rounded"
+                  className="bg-gray-500 text-white p-2 rounded active:bg-blue-200"
                   onClick={() => setUpdateModalOpen(false)}
                 >
                   Cancel
@@ -313,9 +316,10 @@ export const GeneralBookList = () => {
         </div>
 
         {/* Loading Process during Update */}
-        {loading && showSuccessPopup && updateSuccess && updateModalOpen && !updatingData ? (
+        {/* {loading && showSuccessPopup && updateSuccess && updateModalOpen && !updatingData ? (
           <LoadingProcess />
-        ) : null}
+        ) : null} */}
+        {loading && updateModalOpen && <LoadingProcess />}
         {/* Update Success Modal */}
         {updateSuccessPopup && (
           <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
@@ -324,7 +328,7 @@ export const GeneralBookList = () => {
                 <div className="bg-white p-4 rounded shadow-lg">
                   <p className="mb-4">Update successful!</p>
                   <button
-                    className="bg-gray-500 text-white p-2 rounded"
+                    className="bg-gray-500 text-white p-2 rounded active:bg-blue-200"
                     onClick={() => setUpdateSuccessPopup(false)}
                   >
                     Close
