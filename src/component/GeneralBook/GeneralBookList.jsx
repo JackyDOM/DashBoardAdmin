@@ -156,8 +156,8 @@ export const GeneralBookList = () => {
   }, [showSuccessPopup, selectBook.authorId, updateSuccess, selectedCategory]);
 
   return (
-    <section key={selectedCategory}>
-      <div className="container w-auto">
+    <section key={selectedCategory} className="z-10">
+      <div className="container w-auto ">
         {/* Add the category filter dropdown */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Filter by Category:</label>
@@ -217,7 +217,7 @@ export const GeneralBookList = () => {
             </div>
           </div>
         ))}
-        {loading && showSuccessPopup && <LoadingProcess />}
+        {loading && <LoadingProcess />}
         {openDeleteModal && (
           <div className="fixed inset-0 flex items-center justify-center">
             <div
@@ -229,7 +229,7 @@ export const GeneralBookList = () => {
               <p>Are you sure you want to delete this book?</p>
               <div className="mt-4 flex justify-end">
                 <button
-                  className="mr-2 bg-red-500 text-white p-2 rounded"
+                  className="mr-2 bg-red-500 text-white p-2 rounded active:bg-blue-200"
                   onClick={() => {
                     confirmDelete();
                   }}
@@ -237,7 +237,7 @@ export const GeneralBookList = () => {
                   Yes
                 </button>
                 <button
-                  className="bg-gray-500 text-white p-2 rounded"
+                  className="bg-gray-500 text-white p-2 rounded active:bg-blue-200"
                   onClick={() => setOpenDeleteModal(false)}
                 >
                   No

@@ -27,7 +27,7 @@ export const Generalbook = () => {
   };
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
       {/* Header */}
       <ul className="flex items-center justify-center bg-shadow-lg py-3 bg-white ">
         {book.map((books) => (

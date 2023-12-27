@@ -17,26 +17,21 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg bg-gray-700">
-      <div className="flex space-x-10 justify-between w-screen">
-        <a className="ml-5 navbar-brand text-light" href="/dashboard/management">
+    <nav className="bg-gray-700 p-4">
+      <div className="container mx-auto flex justify-between items-center">
+        <a className="text-light" href="/dashboard/management">
           E-Libra Dashboard
         </a>
-        <div className="flex mx-4">
-          <div className="dropdown flex" onClick={toggleAccountDropdown}>
-            <a
-              className="navbar-brand text-light dropdown-toggle"
-              role="button"
-              id="accountDropdown"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded={isAccountDropdownOpen}
+        <div className="flex items-center">
+          <div className="dropdown relative">
+            <button
+              className="text-light dropdown-toggle"
+              onClick={toggleAccountDropdown}
             >
               Account
-            </a>
+            </button>
             <div
-              className={`dropdown-menu mt-5 ${isAccountDropdownOpen ? "show" : ""}`}
-              aria-labelledby="accountDropdown"
+              className={`dropdown-menu ${isAccountDropdownOpen ? "block" : "hidden"}`}
             >
               <a className="dropdown-item" href="/account">
                 Profile
@@ -45,9 +40,9 @@ export const Navbar = () => {
                 Settings
               </a>
               <div className="dropdown-divider"></div>
-              <button 
-                className="dropdown-item" 
-                onClick={logOut}  
+              <button
+                className="dropdown-item"
+                onClick={logOut}
               >
                 Logout
               </button>
