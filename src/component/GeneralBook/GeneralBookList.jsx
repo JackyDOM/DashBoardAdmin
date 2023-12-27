@@ -91,7 +91,7 @@ export const GeneralBookList = () => {
       const bookRef = doc(db, "books", updatedBook.id);
       const newData = {
         title: updatedBook.title,
-        price: updatedBook.price,
+        price: parseInt(updatedBook.price, 10),
         author: updatedBook.author,
         image: updatedBook.image,
       };

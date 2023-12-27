@@ -104,7 +104,7 @@ export const BookCrud = () => {
       />
       <input
         value={BookPrice}
-        onChange={(e) => setBookPrice(e.target.value)}
+        onChange={(e) => setBookPrice(parseInt(e.target.value, 10))}
         className="p-2 rounded-lg"
         placeholder="តម្លៃ សៀវភៅ"
       />
