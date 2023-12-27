@@ -298,11 +298,11 @@ export const GeneralBookList = () => {
                 />
               </div>
               <div className="flex justify-end">
-                <button className="mr-2 bg-green-500 text-white p-2 rounded" onClick={() => confirmUpdate()}>
+                <button className="mr-2 bg-green-500 active:bg-blue-200 text-white p-2 rounded" onClick={() => confirmUpdate()}>
                   Update
                 </button>
                 <button
-                  className="bg-gray-500 text-white p-2 rounded"
+                  className="bg-gray-500 text-white p-2 rounded active:bg-blue-200"
                   onClick={() => setUpdateModalOpen(false)}
                 >
                   Cancel
@@ -324,7 +324,7 @@ export const GeneralBookList = () => {
                 <div className="bg-white p-4 rounded shadow-lg">
                   <p className="mb-4">Update successful!</p>
                   <button
-                    className="bg-gray-500 text-white p-2 rounded"
+                    className="bg-gray-500 text-white p-2 rounded active:bg-blue-200"
                     onClick={() => setUpdateSuccessPopup(false)}
                   >
                     Close
