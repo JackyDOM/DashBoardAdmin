@@ -73,9 +73,11 @@ export const GeneralBookList = () => {
   const handleUpdate = (book) => {
     setUpdatedBook(book);
     setUpdateModalOpen(true);
+    console.log("Update process started");
   };
 
   const confirmUpdate = async () => {
+    setUpdatingData(true);
     setLoading(true);
     try {
       const bookRef = doc(db, "books", updatedBook.id);
@@ -100,6 +102,7 @@ export const GeneralBookList = () => {
       console.error("Error updating document or image:", error.message);
     } finally {
       setLoading(false);
+      setUpdatingData(false);
       setUpdateModalOpen(false);
     }
   };
@@ -313,9 +316,10 @@ export const GeneralBookList = () => {
         </div>
 
         {/* Loading Process during Update */}
-        {loading && showSuccessPopup && updateSuccess && updateModalOpen && !updatingData ? (
+        {/* {loading && showSuccessPopup && updateSuccess && updateModalOpen && !updatingData ? (
           <LoadingProcess />
-        ) : null}
+        ) : null} */}
+        {loading && updateModalOpen && <LoadingProcess />}
         {/* Update Success Modal */}
         {updateSuccessPopup && (
           <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
