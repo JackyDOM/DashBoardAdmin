@@ -1,3 +1,4 @@
+// Login.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { signIn } from "./action";
@@ -12,23 +13,18 @@ const Login = () => {
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userCredential, setUserCredential] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUserCredential(user);
+      if (user) {
+        navigate("/dashboard/management");
+      }
     });
 
     return () => {
       unsubscribe();
     };
-  }, []);
-
-  useEffect(() => {
-    if (userCredential) {
-      navigate("/dashboard/management");
-    }
-  }, [userCredential, navigate]);
+  }, [navigate]);
 
   const onChange = (e) => {
     setInputData((prevState) => ({
@@ -43,13 +39,9 @@ const Login = () => {
 
     try {
       const { email, password } = inputData;
+      console.log("Attempting to sign in with:", email, password); 
 
-      const response = await signIn(email, password);
-      if (response) {
-        setUserCredential({ email });
-        navigate("/dashboard/management");
-        alert("Login success");
-      }
+      await signIn(email, password);
     } catch (error) {
       console.error("Error signing in:", error.message);
     } finally {
@@ -63,7 +55,6 @@ const Login = () => {
         <h1 className="text-3xl font-semibold mb-5">Sign In</h1>
         <p className="text-sm text-gray-600 mb-8">Please provide your credentials</p>
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
-          {/* Form Inputs */}
           <input
             onChange={onChange}
             type="text"

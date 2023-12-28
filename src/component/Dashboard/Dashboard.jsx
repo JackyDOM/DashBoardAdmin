@@ -7,6 +7,7 @@ import { Author } from "../Author/Author";
 import { Generalbook } from "../GeneralBook/Generalbook";
 import { LoadingProcess } from "../LoadingProcess/LoadingProcess";
 
+
 export const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,11 +17,14 @@ export const Dashboard = () => {
   useEffect(() => {
     const authStateChangedListener = (user) => {
       if (user) {
-        // Check user roles or any other criteria to determine if the user is an admin
-        // For simplicity, assuming admin role based on the existence of 'admin' in user's email
         const isAdminUser = user.email && user.email.includes("admin");
         setIsAdmin(isAdminUser);
         setIsLoading(false);
+
+        if (!isAdminUser) {
+          // User is not an admin, redirect to login page
+          navigate("/login");
+        }
       } else {
         // User is not authenticated, redirect to login page
         setIsAdmin(false);
