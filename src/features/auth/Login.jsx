@@ -31,7 +31,7 @@ const Login = () => {
       const responce = await signIn(email, password);
       if (responce) {
         localStorage.setItem("authenticated", true);
-        navigate("/dashboard/management"); // Update the path accordingly
+        navigate("/"); // Update the path accordingly
       }
     } catch (error) {
       console.error("Error signing in:", error.message);
