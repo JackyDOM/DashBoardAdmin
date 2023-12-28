@@ -1,33 +1,56 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Management } from "../../Management";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase";
+import Management from "../management/Management";
 import { Author } from "../Author/Author";
 import { Generalbook } from "../GeneralBook/Generalbook";
 import { LoadingProcess } from "../LoadingProcess/LoadingProcess";
 
 export const Dashboard = () => {
-  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000); // Simulating a 2-second loading time
-    return () => clearTimeout(timer);
-  }, []);
+    const authStateChangedListener = (user) => {
+      if (user) {
+        // Check user roles or any other criteria to determine if the user is an admin
+        // For simplicity, assuming admin role based on the existence of 'admin' in user's email
+        const isAdminUser = user.email && user.email.includes("admin");
+        setIsAdmin(isAdminUser);
+        setIsLoading(false);
+      } else {
+        // User is not authenticated, redirect to login page
+        setIsAdmin(false);
+        setIsLoading(false);
+        navigate("/login");
+      }
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, authStateChangedListener);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [navigate]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
   const renderContent = () => {
+    if (!isAdmin) {
+      return <div className="text-center text-2xl font-medium">We Allow Only admin to access</div>;
+    }
+
     switch (window.location.pathname) {
       case "/dashboard/management":
         return <Management />;
       case "/dashboard/author":
         return <Author />;
-      case "/dashboard/general-book":
+      case "/dashboard/book":
         return <Generalbook />;
       default:
         return (
@@ -60,56 +83,54 @@ export const Dashboard = () => {
 
             {isSidebarOpen && (
               <>
-                <p className="my-3 text-center text-gray-800 text-4xl font-title font-bold">
-                  Welcome Admin
-                </p>
-
                 <ul className="my-5 duration-300 whitespace-nowrap">
-                  <li className="flex items-center justify-center">
-                    <Link
-                      to="/dashboard/management"
-                      className={`${
-                        window.location.pathname === "/dashboard/management"
-                          ? "bg-gray-900 text-white"
-                          : "bg-neutral-100"
-                      } w-full h-[70px]  border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
-                    >
-                      Management
-                    </Link>
-                  </li>
+                  {isAdmin && (
+                    <>
+                      <li className="flex items-center justify-center">
+                        <Link
+                          to="/dashboard/management"
+                          className={`${
+                            window.location.pathname === "/dashboard/management"
+                              ? "bg-gray-900 text-white"
+                              : "bg-neutral-100"
+                          } w-full h-[70px]  border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
+                        >
+                          Management
+                        </Link>
+                      </li>
 
-                  <li className="flex items-center justify-center">
-                    <Link
-                      to="/dashboard/author"
-                      className={`${
-                        window.location.pathname === "/dashboard/author"
-                          ? "bg-gray-900 text-white"
-                          : "bg-neutral-100"
-                      } w-full h-[70px] border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
-                    >
-                      Author
-                    </Link>
-                  </li>
+                      <li className="flex items-center justify-center">
+                        <Link
+                          to="/dashboard/author"
+                          className={`${
+                            window.location.pathname === "/dashboard/author"
+                              ? "bg-gray-900 text-white"
+                              : "bg-neutral-100"
+                          } w-full h-[70px] border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
+                        >
+                          Author
+                        </Link>
+                      </li>
 
-                  <li className="flex items-center justify-center">
-                    <Link
-                      to="/dashboard/general-book"
-                      className={`${
-                        window.location.pathname === "/dashboard/general-book"
-                          ? "bg-gray-900 text-white"
-                          : "bg-neutral-100"
-                      } w-full h-[70px]  border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
-                    >
-                      Books
-                    </Link>
-                  </li>
+                      <li className="flex items-center justify-center">
+                        <Link
+                          to="/dashboard/book"
+                          className={`${
+                            window.location.pathname === "/dashboard/book"
+                              ? "bg-gray-900 text-white"
+                              : "bg-neutral-100"
+                          } w-full h-[70px]  border text-center font-bold text-xl p-3 uppercase cursor-pointer`}
+                        >
+                          Books
+                        </Link>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </>
             )}
           </div>
-          <div className="flex-grow overflow-y-auto bg-neutral-200 w-[75%]">
-            {renderContent()}
-          </div>
+          <div className="flex-grow overflow-y-auto bg-neutral-200 w-[75%]">{renderContent()}</div>
         </div>
       )}
     </>

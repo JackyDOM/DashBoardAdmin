@@ -3,10 +3,15 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 
 export const signIn = async (email, password) => {
   try {
+    if (!email || !password) {
+      console.error("Please provide both email and password.");
+      return false;
+    }
+
     await signInWithEmailAndPassword(auth, email, password);
-    alert("Welcome to our website");
     return true;
   } catch (error) {
-    alert("Incorrect password. Please try again.");
+    console.error("Error signing in:", error.message);
+    return false;
   }
 };

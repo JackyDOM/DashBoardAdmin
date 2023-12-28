@@ -1,9 +1,9 @@
-// Login.js
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { signIn } from "./action";
 import { LoadingProcess } from "../../component/LoadingProcess/LoadingProcess";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,6 +12,23 @@ const Login = () => {
     password: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userCredential, setUserCredential] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUserCredential(user);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (userCredential) {
+      navigate("/dashboard/management");
+    }
+  }, [userCredential, navigate]);
 
   const onChange = (e) => {
     setInputData((prevState) => ({
@@ -25,17 +42,16 @@ const Login = () => {
     setIsSubmitting(true);
 
     try {
-      // Display the loading process
       const { email, password } = inputData;
 
-      const responce = await signIn(email, password);
-      if (responce) {
-        localStorage.setItem("authenticated", true);
-        navigate("/"); // Update the path accordingly
+      const response = await signIn(email, password);
+      if (response) {
+        setUserCredential({ email });
+        navigate("/dashboard/management");
+        alert("Login success");
       }
     } catch (error) {
       console.error("Error signing in:", error.message);
-      // Handle the error if needed
     } finally {
       setIsSubmitting(false);
     }

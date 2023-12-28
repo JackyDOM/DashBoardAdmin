@@ -1,17 +1,40 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { signOut, onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebase";
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
+  const [unsubscribe, setUnsubscribe] = useState(null);
+
+  useEffect(() => {
+    const authStateChangedListener = (admin) => {
+      if (!admin) {
+        navigate("/login");
+      }
+    };
+    const authUnsubscribe = onAuthStateChanged(auth, authStateChangedListener);
+    setUnsubscribe(() => authUnsubscribe);
+    return () => {
+      authUnsubscribe();
+    };
+  }, [navigate]);
 
   const toggleAccountDropdown = () => {
     setIsAccountDropdownOpen(!isAccountDropdownOpen);
   };
 
   const logOut = () => {
-    localStorage.clear();
-    navigate("/login"); // Redirect to the login page
+    if (unsubscribe) {
+      unsubscribe();
+    }
+    signOut(auth)
+      .then(() => {
+        console.log("Logout successful.");
+        navigate(-1);
+      })
+      .catch((error) => console.error(error));
   };
 
   return (
@@ -22,26 +45,15 @@ export const Navbar = () => {
         </a>
         <div className="flex items-center">
           <div className="dropdown relative">
-            <button
-              className="text-light dropdown-toggle"
-              onClick={toggleAccountDropdown}
-            >
+            <button className="text-light dropdown-toggle" onClick={toggleAccountDropdown}>
               Account
             </button>
-            <div
-              className={`dropdown-menu ${isAccountDropdownOpen ? "block" : "hidden"}`}
-            >
+            <div className={`dropdown-menu ${isAccountDropdownOpen ? "block" : "hidden"}`}>
               <a className="dropdown-item" href="/account">
                 Profile
               </a>
-              <a className="dropdown-item" href="/account/settings">
-                Settings
-              </a>
               <div className="dropdown-divider"></div>
-              <button
-                className="dropdown-item"
-                onClick={logOut}
-              >
+              <button className="dropdown-item" onClick={logOut}>
                 Logout
               </button>
             </div>
