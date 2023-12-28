@@ -157,7 +157,8 @@ export const GeneralBookList = () => {
 
   return (
     <section key={selectedCategory} className="z-10">
-      <div className="container w-auto ">
+      <div className=" mx-auto">
+
         {/* Add the category filter dropdown */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">Filter by Category:</label>

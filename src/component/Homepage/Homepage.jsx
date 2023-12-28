@@ -1,29 +1,30 @@
-import React, { useState } from "react";
-import Button from "react-bootstrap/Button";
-import Form from "react-bootstrap/Form";
+import React, { useState, useEffect } from 'react';
+import { LoadingProcess } from "../LoadingProcess/LoadingProcess";
 
-const Homepage = () => {
-  const [Banner, setbanner] = useState([]);
+function Homepage() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading delay (you can replace this with your actual data fetching logic)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); // Simulating a 2-second loading time
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <Form>
-
-      
-      <Form.Group className="mb-3" controlId="formBasicEmail">
-        <Form.Label>Email address</Form.Label>
-        <Form.Control type="email" placeholder="Enter email" />
-        <Form.Text className="text-muted"></Form.Text>
-      </Form.Group>
-
-      <Form.Group className="mb-3" controlId="formBasicPassword">
-        <Form.Label>Password</Form.Label>
-        <Form.Control type="password" placeholder="Password" />
-      </Form.Group>
-      <Button variant="primary" type="submit">
-        Submit
-      </Button>
-    </Form>
+    <>
+      {isLoading ? (
+        <LoadingProcess />
+      ) : (
+        <div className="flex items-center justify-center h-screen bg-gray-200">
+          <div className="text-4xl font-bold text-center hover:text-blue-500 transform hover:scale-105 transition-transform duration-300">
+            WELCOME ADMIN DASHBOARD
+          </div>
+        </div>
+      )}
+    </>
   );
-};
+}
 
 export default Homepage;
