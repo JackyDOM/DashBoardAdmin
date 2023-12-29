@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
@@ -7,6 +7,7 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
   const [unsubscribe, setUnsubscribe] = useState(null);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const authStateChangedListener = (admin) => {
@@ -16,8 +17,19 @@ export const Navbar = () => {
     };
     const authUnsubscribe = onAuthStateChanged(auth, authStateChangedListener);
     setUnsubscribe(() => authUnsubscribe);
+
+    // Close dropdown when clicking outside
+    const handleOutsideClick = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsAccountDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleOutsideClick);
+
     return () => {
       authUnsubscribe();
+      document.removeEventListener("click", handleOutsideClick);
     };
   }, [navigate]);
 
@@ -25,16 +37,17 @@ export const Navbar = () => {
     setIsAccountDropdownOpen(!isAccountDropdownOpen);
   };
 
-  const logOut = () => {
-    if (unsubscribe) {
-      unsubscribe();
+  const logOut = async () => {
+    try {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+      await signOut(auth);
+      console.log("Logout successful.");
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
     }
-    signOut(auth)
-      .then(() => {
-        console.log("Logout successful.");
-        navigate(-1);
-      })
-      .catch((error) => console.error(error));
   };
 
   return (
@@ -44,7 +57,7 @@ export const Navbar = () => {
           E-Libra Dashboard
         </a>
         <div className="flex items-center">
-          <div className="dropdown relative">
+          <div className="dropdown relative" ref={dropdownRef}>
             <button className="text-light dropdown-toggle" onClick={toggleAccountDropdown}>
               Account
             </button>

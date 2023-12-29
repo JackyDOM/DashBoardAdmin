@@ -9,6 +9,7 @@ import { AddAuthor } from "./component/Author/AddAuthor";
 import { AuthorList } from "./component/Author/AuthorList";
 import Login from "./features/auth/Login";
 import ProtectedRoute from "./ProtectedRoute"; // Update the path
+import UnauthorizedPage from "./component/Unauthorized/UnauthorizedPage ";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/inputauthor" element={<ProtectedRoute element={<AddAuthor />} />} />
         <Route path="/dashboard/author/list" element={<ProtectedRoute element={<AuthorList />} />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
       </Routes>
     </Router>
   );

@@ -1,19 +1,20 @@
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 
+const expectedEmail = "admin@example.com";
+
 const isAdmin = (user) => {
-  // Update this function based on your user data structure
-  return user && user.roles && user.roles.includes("admin");
+  return user && user.email === expectedEmail;
 };
 
 const ProtectedRoute = ({ element }) => {
-  const [admin, setAdmin] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setAdmin(user);
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      setUser(authUser);
     });
 
     return () => {
@@ -21,21 +22,17 @@ const ProtectedRoute = ({ element }) => {
     };
   }, []);
 
-  if (admin === null) {
+  if (user === null) {
     return <div>Loading...</div>;
   }
 
-  if (!admin) {
-    // Redirect to login if not authenticated
+  if (!user) {
     return <Navigate to="/login" />;
   }
 
-  if (!isAdmin(admin)) {
-    // Redirect to home if not an admin
-    return <Navigate to="/" />;
+  if (!isAdmin(user)) {
+    return <Navigate to="/unauthorized" />;
   }
-
-  // User is authenticated and has admin role, render the protected route
   return element;
 };
 
