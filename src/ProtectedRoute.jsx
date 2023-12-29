@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 
-const expectedEmail = "admin@example.com";
+const expectedEmail = "admin@gmail.com";
 
 const isAdmin = (user) => {
   return user && user.email === expectedEmail;
@@ -21,7 +21,7 @@ const ProtectedRoute = ({ element }) => {
       unsubscribe();
     };
   }, []);
-
+  console.log(user);
   if (user === null) {
     return <div>Loading...</div>;
   }
