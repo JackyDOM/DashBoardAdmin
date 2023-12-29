@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 
+
 const expectedEmail = "admin@gmail.com";
 
 const isAdmin = (user) => {
