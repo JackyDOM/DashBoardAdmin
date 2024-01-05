@@ -274,6 +274,15 @@ export const GeneralBookList = () => {
                 />
               </div>
               <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700">Author:</label>
+                <input
+                  type="text"
+                  className="mt-1 p-2 border rounded-md w-full"
+                  value={updatedBook.author}
+                  onChange={(e) => setUpdatedBook({ ...updatedBook, author: e.target.value })}
+                />
+              </div>
+              <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700">Description:</label>
                 <input
                   type="text"
@@ -374,6 +383,12 @@ export const GeneralBookList = () => {
                   Description:{" "}
                   <p className="flex ml-4 text-gray-700 text-lg subpixel-antialiased ">
                     {updatedBook.description}
+                  </p>
+                </p>
+                <p className="flex text-xl font-bold">
+                  author:{" "}
+                  <p className="flex ml-4 text-gray-700 text-lg subpixel-antialiased ">
+                    {updatedBook.author}
                   </p>
                 </p>
                 <h3>{updatedBook.type}</h3>

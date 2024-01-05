@@ -16,6 +16,7 @@ export const BookCrud = () => {
   const [Stock, setStock] = useState(0);
   const [authorList, setAuthorList] = useState([]);
   const [selectedAuthor, setSelectedAuthor] = useState("");
+  const [newAuthorName, setNewAuthorName] = useState("");
   const [BookCover, setBookCover] = useState(null);
   const [BookPdf, setBookPdf] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -51,6 +52,17 @@ export const BookCrud = () => {
       // Upload PDF
       await uploadBytes(pdfRef, BookPdf);
       const pdfUrl = await getDownloadURL(pdfRef);
+
+      // Get the selected author's ID
+      const selectedAuthorData = authorList.find((author) => author.authName === selectedAuthor);
+      let authorId = selectedAuthorData ? selectedAuthorData.id : null;
+
+      // Add the author's name to the Author collection if it doesn't exist
+      if (newAuthorName && !authorId) {
+        const newAuthorRef = await addDoc(authorCollection, { authName: newAuthorName });
+        authorId = newAuthorRef.id;
+      }
+
       await addDoc(value, {
         title: Booktitle,
         description: Bookdesc,
@@ -59,7 +71,7 @@ export const BookCrud = () => {
         stock: Stock,
         image: imageUrl,
         bookPdf: pdfUrl,
-        author: selectedAuthor,
+        author: authorId,
         categories: type, // Add category fields
       });
       alert("Book data & Image Upload");
@@ -102,8 +114,17 @@ export const BookCrud = () => {
         className="p-2 rounded-lg  border focus:outline-none focus:border-blue-500"
       />
       <input
+        value={newAuthorName}
+        onChange={(e) => setNewAuthorName(e.target.value)}
+        placeholder="ឈ្មោះអ្នកនិពន្ធ"
+        className="p-2 rounded-lg"
+      />
+      <input
         value={BookPrice}
-        onChange={(e) => setBookPrice(parseInt(e.target.value, 10))}
+        onChange={(e) => {
+          const value = e.target.value;
+          setBookPrice(value === "" ? "" : parseInt(value, 10));
+        }}
         className="p-2 rounded-lg"
         placeholder="តម្លៃ សៀវភៅ"
       />
