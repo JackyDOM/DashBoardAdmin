@@ -4,12 +4,12 @@ import { getStorage } from "firebase/storage";
 import { getFirestore} from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBXuXYbnMvuzYmNJtGAGlxjPHWG04UiXVQ",
-  authDomain: "e-libra-bcb05.firebaseapp.com",
-  projectId: "e-libra-bcb05",
-  storageBucket: "e-libra-bcb05.appspot.com",
-  messagingSenderId: "346191823722",
-  appId: "1:346191823722:web:63e71f0e21762409c1db13",
+  apiKey: "AIzaSyDlCzQw0jACqDXO2291PKuEgTOEb84B1Wo",
+  authDomain: "project-website-e-library.firebaseapp.com",
+  projectId: "project-website-e-library",
+  storageBucket: "project-website-e-library.appspot.com",
+  messagingSenderId: "962962738093",
+  appId: "1:962962738093:web:c24fb69d1060d6ba942f24",
 };
 
 // Initialize Firebase

@@ -40,8 +40,8 @@ export const BookCrud = () => {
   const handleAddBook = async () => {
     if (!BookCover || !BookPdf || loading) return;
     setLoading(true);
-    const imgRef = ref(imgDB, `WebsiteProject/books/${BookCover.name + uuidv4()}`);
-    const pdfRef = ref(imgDB, `WebsiteProject/books/${BookPdf.name + uuidv4()}`);
+    const imgRef = ref(imgDB, `/books/bookImage/${BookCover.name + uuidv4()}`);
+    const pdfRef = ref(imgDB, `/books/bookPdf/${BookPdf.name + uuidv4()}`);
 
     try {
       // Upload image
@@ -52,17 +52,16 @@ export const BookCrud = () => {
       await uploadBytes(pdfRef, BookPdf);
       const pdfUrl = await getDownloadURL(pdfRef);
       await addDoc(value, {
-        title: Booktitle,
-        description: Bookdesc,
-        price: BookPrice,
-        date: BookDate,
-        stock: Stock,
+        title: "panha",
+        description: "loremfnjxhfvxcjvjxc",
+        price: 10,
+        date: "10 30 2004",
+        stock: 3,
         image: imageUrl,
         bookPdf: pdfUrl,
-        author: selectedAuthor,
-        categories: type, // Add category field
+        author: "panha",
+        categories: "comic", // Add category field
       });
-
       alert("Book data & Image Upload");
 
       // Reset form fields after successful upload
