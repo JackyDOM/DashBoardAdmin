@@ -60,7 +60,7 @@ export const BookCrud = () => {
         image: imageUrl,
         bookPdf: pdfUrl,
         author: selectedAuthor,
-        categories: type, // Add category field
+        categories: type, // Add category fields
       });
       alert("Book data & Image Upload");
 
