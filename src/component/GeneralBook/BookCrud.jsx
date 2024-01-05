@@ -52,15 +52,15 @@ export const BookCrud = () => {
       await uploadBytes(pdfRef, BookPdf);
       const pdfUrl = await getDownloadURL(pdfRef);
       await addDoc(value, {
-        title: "panha",
-        description: "loremfnjxhfvxcjvjxc",
-        price: 10,
-        date: "10 30 2004",
-        stock: 3,
+        title: Booktitle,
+        description: Bookdesc,
+        price: BookPrice,
+        date: BookDate,
+        stock: Stock,
         image: imageUrl,
         bookPdf: pdfUrl,
-        author: "panha",
-        categories: "comic", // Add category field
+        author: selectedAuthor,
+        categories: type, // Add category field
       });
       alert("Book data & Image Upload");
 
